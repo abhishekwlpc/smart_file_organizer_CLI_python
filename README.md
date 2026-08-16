@@ -1,62 +1,108 @@
-# Smart File Organizer
+# 📂 Smart File Organizer
 
-A command-line file organization application built with Python.
+A command-line file organizer built with Python.
 
-This is **Project 2** in my project-based Python engineering progression. The project is being developed in multiple versions so I can practice designing, building, testing, debugging, and refactoring Python applications independently.
+This is **Project 2** in my project-based Python engineering progression. The project started from a small prototype and is being improved through multiple versions so that each version develops a specific engineering skill.
 
-## Current Version
+The goal is not to build a perfect production file manager immediately. The goal is to practice:
 
-**V1 — File Classification & Organization Upgrade**
+**Understand → Design → Code → Test → Review → Refactor → Improve**
 
-V1 improves the original prototype by introducing:
+---
+
+# 📌 Current Version
+
+## V2 — Classification Refactor & Safer Organization
+
+V2 is the current frozen checkpoint for Project 2.
+
+Compared with the original/base version, V2 introduces:
 
 - `pathlib.Path` for filesystem paths
 - User-selected source directories
-- Direct-file processing only
-- `Documents`, `Images`, `Videos`, `Audios`, and `Others` categories
+- Direct-file processing
+- Directory skipping
 - Case-insensitive extension matching
-- Automatic destination-folder creation
-- Duplicate filename protection using UUID-based names
-- Unsupported-file handling through `Others`
+- Centralized extension configuration
+- Centralized destination-folder configuration
+- One directory scan
+- Automatic category-folder creation
+- `Documents`, `Images`, `Videos`, `Audios`, and `Others`
+- Duplicate filename handling using sequential suffixes
+- File organization summary counts
+- Specific handling for `FileExistsError` and `FileNotFoundError`
 
-The project intentionally uses the Python standard library only.
+The application intentionally remains a simple Python CLI using the standard library.
 
-## Features
+---
 
-### Directory selection
+# ✨ Features
 
-The program asks the user for a directory path and verifies that the supplied path is a directory.
+## 1. Select a source directory
 
-### Direct-file processing
+The program asks the user for a directory path.
 
-Only files directly inside the selected directory are processed. Existing subdirectories are ignored.
+Example:
+
+```text
+C:\Users\Abhi\Downloads
+```
+
+The application checks that the supplied path is a directory before processing it.
+
+---
+
+## 2. Process files directly inside the directory
+
+V2 scans the selected directory once and processes only actual files.
+
+Directories are ignored.
 
 Example:
 
 ```text
 Downloads/
-├── report.pdf      -> process
-├── photo.jpg       -> process
-├── song.mp3        -> process
-├── Projects/       -> ignore
-└── Backup/         -> ignore
+├── report.pdf       → process
+├── image.jpg        → process
+├── song.mp3         → process
+├── Projects/        → ignore
+└── Backup/          → ignore
 ```
 
-### Categories
+---
 
-The organizer creates these directories inside the selected directory when needed:
+## 3. File categories
+
+Files are classified into:
 
 ```text
-Documents/
-Images/
-Videos/
-Audios/
-Others/
+Documents
+Images
+Videos
+Audios
+Others
 ```
 
-### Case-insensitive extensions
+The destination folders are created inside the selected source directory.
 
-Extensions are normalized to lowercase so examples such as:
+Example:
+
+```text
+Downloads/
+├── Documents/
+├── Images/
+├── Videos/
+├── Audios/
+└── Others/
+```
+
+---
+
+## 4. Case-insensitive extension handling
+
+The application normalizes a file's extension to lowercase.
+
+Therefore:
 
 ```text
 PHOTO.JPG
@@ -64,11 +110,13 @@ photo.jpg
 Photo.JpG
 ```
 
-are treated consistently.
+are treated consistently as `.jpg`.
 
-### Supported document extensions
+---
 
-The current V1 list includes:
+## 5. Supported document extensions
+
+The current V2 document set includes:
 
 ```text
 .doc
@@ -104,7 +152,9 @@ The current V1 list includes:
 .vsdm
 ```
 
-### Supported image extensions
+---
+
+## 6. Supported image extensions
 
 ```text
 .jpg
@@ -122,7 +172,9 @@ The current V1 list includes:
 .heif
 ```
 
-### Supported video extensions
+---
+
+## 7. Supported video extensions
 
 ```text
 .mp4
@@ -135,7 +187,9 @@ The current V1 list includes:
 .m4v
 ```
 
-### Supported audio extensions
+---
+
+## 8. Supported audio extensions
 
 ```text
 .mp3
@@ -156,213 +210,258 @@ The current V1 list includes:
 .snd
 ```
 
-### Unsupported files
+---
 
-Any extension not recognized by the supported mappings is moved to:
+## 9. Unsupported files
+
+If a file does not match any known category, it is placed in:
 
 ```text
 Others/
 ```
 
-### Duplicate filenames
+This prevents unsupported files from being silently ignored.
 
-When a destination already contains a file with the same name, V1 generates a UUID-based alternative name before moving the file. This avoids overwriting the existing destination file.
+---
 
-## Technologies
+## 10. Duplicate filename handling
 
-- Python 3
-- `pathlib`
-- `shutil`
-- `uuid`
-- Standard-library filesystem operations
-- Git / GitHub
+When a destination already contains a file with the same name, the organizer searches for an available sequential filename.
 
-Pillow is intentionally not used in V1 because the organizer only needs filename-extension classification, not image-content analysis.
-
-## Project Structure
-
-```text
-smart_file_organizer_CLI_python/
-│
-├── Audios/
-├── Documents/
-├── Images/
-├── Videos/
-├── Others/
-├── main.py
-└── README.md
-```
-
-The category directories are created inside the selected source directory.
-
-## Running
-
-Check Python:
-
-```bash
-python --version
-```
-
-Run:
-
-```bash
-python main.py
-```
-
-Then enter the directory to organize.
-
-## Architecture
-
-The current V1 flow is:
-
-```text
-User
-  ↓
-Enter directory
-  ↓
-Validate directory
-  ↓
-Inspect direct children
-  ↓
-Normalize extension
-  ↓
-Classify file
-  ↓
-Choose destination category
-  ↓
-Check duplicate filename
-  ↓
-Generate alternative name if required
-  ↓
-Move file
-```
-
-## Base Version → V1 Improvements
-
-| Area | Base Version | V1 |
-|---|---|---|
-| Path handling | `os` + string paths | `pathlib.Path` |
-| User-selected directory | Yes | Yes |
-| Direct-file processing | Partial | Yes |
-| Destination paths | Hardcoded | Derived from selected directory |
-| Documents | Limited set | Expanded |
-| Images | Limited set | Expanded |
-| Videos | Limited set | Expanded |
-| Audio | Limited set | Expanded |
-| Case-insensitive extensions | No | Yes |
-| Duplicate protection | No | Yes |
-| Unsupported files | Ignored | `Others/` |
-| Automatic category folders | Partial | Yes |
-
-## Known V1 Limitations
-
-V1 is a learning implementation, not a production file-management utility.
-
-### Repeated classification logic
-
-Documents, images, videos, audio, and other files are currently processed in separate blocks. V2 should reduce this duplication.
-
-### Hardcoded extension mappings
-
-The extension sets are currently defined directly in the source file. V2 can centralize the category configuration.
-
-### Duplicate naming
-
-UUID-based names avoid collisions, but they are not especially user-friendly. V2 can explore names such as:
+Example:
 
 ```text
 report.pdf
 report-1.pdf
 report-2.pdf
+report-3.pdf
 ```
 
-while still checking for collisions.
+The organizer checks for collisions before selecting the new name.
 
-### No operation summary
+The goal is to avoid overwriting an existing file.
 
-V1 does not yet report counts such as:
+---
+
+# 🛠️ Technologies Used
+
+- Python 3
+- `pathlib`
+- Standard-library filesystem operations
+- Git / GitHub
+
+No third-party Python packages are required.
+
+Pillow is intentionally not used because this project classifies files from their extensions rather than analyzing their contents.
+
+---
+
+# 📂 Project Structure
 
 ```text
-Documents: 5
-Images: 8
-Videos: 2
-Audios: 3
-Others: 4
+smart_file_organizer_CLI_python/
+│
+├── main.py
+└── README.md
 ```
 
-This is a strong V2 candidate.
+The category directories are created dynamically inside the directory selected by the user.
 
-### Limited filesystem error handling
+---
 
-Permission errors, inaccessible files, and move failures are not yet handled comprehensively.
+# 🚀 Running the Application
 
-### No dry-run
+## Prerequisites
 
-The current program performs real filesystem changes immediately.
+Install Python 3.
 
-### No recursive processing
+Check the installed version:
 
-V1 intentionally processes only direct files. Recursive scanning can be considered later.
+```bash
+python --version
+```
 
-## V2 Roadmap
+## Run
 
-V2 should focus on **refactoring and reliability**, not simply adding more extensions.
+From the project directory:
 
-Planned candidates:
+```bash
+python main.py
+```
 
-- [ ] Centralize extension-to-category mappings
-- [ ] Reduce duplicated classification loops
-- [ ] Create reusable helper functions
-- [ ] Improve duplicate filename generation
-- [ ] Add operation summary/counts
-- [ ] Handle file move errors explicitly
-- [ ] Handle permission errors
-- [ ] Improve invalid-path handling
-- [ ] Improve CLI messages
-- [ ] Consider dry-run mode
-- [ ] Expand edge-case testing
-- [ ] Decide whether recursive processing belongs in a later version
+Then enter the directory that should be organized.
 
-## Testing
+---
 
-Important tests include:
+# 🏗️ V2 Architecture
 
-### Valid directory
+The current V2 flow is:
 
-Give the program a real directory containing mixed file types.
+```text
+User
+  ↓
+Enter source directory
+  ↓
+Validate directory
+  ↓
+Scan directory once
+  ↓
+Ignore directories
+  ↓
+Normalize file extension
+  ↓
+Find matching category
+  ↓
+Determine destination folder
+  ↓
+Create destination folder if required
+  ↓
+Check filename collision
+  ↓
+Generate available filename when necessary
+  ↓
+Move file
+  ↓
+Update category counter
+  ↓
+Display summary
+```
 
-Expected: files are moved into the correct categories.
+The important V2 improvement is that the organizer no longer scans the entire source directory separately for each category.
 
-### Invalid path
+---
 
-Give a nonexistent path.
+# 🔄 Base Version → V1 → V2
 
-Expected: the application reports that the path is not a directory.
+## Base Version
 
-### File instead of directory
+The original implementation:
 
-Give the path of a single file.
+- Used `os.listdir()`
+- Used hardcoded destination paths
+- Repeated classification blocks
+- Supported fewer file types
+- Did not provide robust duplicate handling
+- Did not have an `Others` category
 
-Expected: the application reports that the selected path is not a directory.
+## V1
 
-### Mixed-case extensions
+V1 introduced:
+
+- `pathlib.Path`
+- User-selected destination structure
+- Direct-file processing
+- Case-insensitive extension matching
+- Expanded extension lists
+- `Others` category
+- Duplicate filename handling
+- Summary counts
+
+## V2
+
+V2 focused on refactoring the V1 implementation:
+
+- One directory scan
+- Centralized extension configuration
+- Centralized folder configuration
+- Generic category lookup
+- Sequential duplicate naming
+- Improved filesystem exception handling
+- Cleaner `pathlib` usage
+
+---
+
+# 🧠 Main Engineering Lesson from V2
+
+V1 was mainly about:
+
+> **Making the file organizer work.**
+
+V2 is about:
+
+> **Representing the file-classification rules as data so the program can process all categories through one general flow.**
+
+The important mental shift is:
+
+```text
+V1
+
+Document?
+    → document logic
+
+Image?
+    → image logic
+
+Video?
+    → video logic
+```
+
+toward:
+
+```text
+File
+ ↓
+Find matching category
+ ↓
+Category determines destination
+ ↓
+Move file
+```
+
+This reduces duplicated control flow and makes the organizer easier to extend.
+
+---
+
+# 🧪 Testing Scenarios
+
+## Valid directory
+
+Provide a real directory containing mixed files.
+
+Expected:
+
+Files are moved into the correct categories.
+
+## Invalid path
+
+Provide a nonexistent path.
+
+Expected:
+
+The application reports that the path is not a directory.
+
+## File instead of directory
+
+Provide the path of an individual file.
+
+Expected:
+
+The application reports that the selected path is not a directory.
+
+## Existing subdirectories
+
+Existing directories in the source folder should be ignored.
+
+## Mixed-case extensions
 
 Examples:
 
 ```text
 IMAGE.JPG
-report.PDF
-video.Mp4
-song.MP3
+REPORT.PDF
+VIDEO.Mp4
+SONG.MP3
 ```
 
-Expected: correct categorization.
+Expected:
 
-### Duplicate filename
+Correct categorization.
 
-A file with a destination name that already exists should not overwrite the existing file.
+## Duplicate names
 
-### Unsupported extension
+If a destination filename already exists, the organizer should create a new sequential name rather than overwrite the existing file.
+
+## Unsupported files
 
 Examples:
 
@@ -372,41 +471,135 @@ archive.zip
 random.xyz
 ```
 
-Expected: move to `Others/`.
+Expected:
 
-### Existing category directories
+Move to `Others/`.
 
-Existing category directories should not be treated as files to organize.
+## Summary
 
-## Engineering Lessons
-
-Project 1 focused on:
+The final output should report counts for:
 
 ```text
-Data
- ↓
-Functions
- ↓
-JSON persistence
+Documents
+Images
+Videos
+Audios
+Others
 ```
 
-Project 2 introduces:
+---
+
+# ⚠️ Known V2 Limitations
+
+V2 is a learning checkpoint, not a production-grade file management application.
+
+The following items are intentionally left for V3 or later.
+
+## 1. Category configuration can still be unified further
+
+V2 stores extension sets and folder names in related but separate structures.
+
+A later version can represent a complete category configuration as a single structure.
+
+## 2. Collision logic can be extracted
+
+The duplicate-name logic currently lives inside the main processing flow.
+
+V3 can separate:
 
 ```text
-Filesystem
- ↓
-Paths
- ↓
-Files vs directories
- ↓
-Classification
- ↓
-Safe movement
+Find available destination name
 ```
 
-The purpose is to learn how filesystem operations can introduce real side effects and why those operations need deliberate design.
+from:
 
-## Project Progression
+```text
+Move the file
+```
+
+## 3. Filesystem error handling can be expanded
+
+Possible failures include:
+
+- Permission errors
+- Locked or inaccessible files
+- Failed directory creation
+- Failed file movement
+- Files disappearing during processing
+
+A later version can define a more complete failure strategy.
+
+## 4. Category counters are explicit
+
+The current implementation uses separate counters for each category.
+
+A later refactor can make the statistics more data-driven.
+
+## 5. No dry-run mode
+
+The current application performs real file operations immediately.
+
+A later version could support previewing changes before moving files.
+
+## 6. No recursive processing
+
+V2 intentionally processes only files directly inside the selected directory.
+
+Recursive scanning can be considered later.
+
+---
+
+# 🎯 V3 Roadmap
+
+V3 should focus on **cleaner design and stronger filesystem reliability**.
+
+Potential goals:
+
+- [ ] Unify category configuration
+- [ ] Extract reusable destination-name logic
+- [ ] Further reduce duplicated code
+- [ ] Improve filesystem exception handling
+- [ ] Improve reporting of failed moves
+- [ ] Improve category/count handling
+- [ ] Improve function-level separation of responsibilities
+- [ ] Add stronger edge-case testing
+- [ ] Consider a dry-run mode
+- [ ] Review whether recursive organization belongs in a later version
+
+V3 should still remain a standard-library CLI application.
+
+---
+
+# 📈 Current Status
+
+| Item | Status |
+|---|---|
+| Base version | ✅ Complete |
+| V1 upgrade | ✅ Complete |
+| V2 one-pass scanning | ✅ Complete |
+| File-only processing | ✅ Complete |
+| Case-insensitive extensions | ✅ Complete |
+| Documents | ✅ Complete |
+| Images | ✅ Complete |
+| Videos | ✅ Complete |
+| Audios | ✅ Complete |
+| Others | ✅ Complete |
+| Summary counts | ✅ Complete |
+| Duplicate protection | ✅ Complete |
+| Centralized extension configuration | ✅ Complete |
+| Folder configuration | ✅ Complete |
+| Generic category lookup | ✅ Complete |
+| Unified category structure | 🔄 V3 |
+| Reusable collision logic | 🔄 V3 |
+| Expanded filesystem error handling | 🔄 V3 |
+| Dry-run | 🔄 Future |
+| Recursive scanning | 🔄 Future |
+
+---
+
+# 🚀 Project-Based Python Progression
+
+This is Project 2 in the larger progression:
 
 ```text
 Project 1
@@ -440,40 +633,26 @@ Project 10
 Full-Stack AI Platform
 ```
 
-## Current Status
+Each project introduces a different engineering problem rather than simply adding features to the previous project.
 
-| Item | Status |
-|---|---|
-| Base version | Complete |
-| User-selected directory | Complete |
-| Directory validation | Complete |
-| `pathlib` usage | Complete |
-| Direct-file processing | Complete |
-| Documents category | Complete |
-| Images category | Complete |
-| Videos category | Complete |
-| Audios category | Complete |
-| Others category | Complete |
-| Case-insensitive extensions | Complete |
-| Duplicate protection | Complete |
-| Centralized classification | V2 |
-| Move-error handling | V2 |
-| Operation summary | V2 |
-| Dry-run mode | Future |
-| Recursive processing | Future |
+---
 
-## Author
+# 👨‍💻 Author
 
 **Abhishek**
 
 Software Engineering & AI Engineering Learner
 
-## Final Note
+---
+
+# ⭐ Final Note
 
 Smart File Organizer is intentionally being developed in versions.
 
-The objective is not to create the most feature-rich file organizer. The objective is to practice:
+The objective is not to create the most feature-rich file organizer.
+
+The objective is to build strong software-engineering habits through repeated cycles of:
 
 **Understand → Design → Code → Test → Debug → Review → Refactor → Improve**
 
-Build → Learn → Improve → Build Something Harder.
+**Build → Learn → Improve → Build Something Harder. 🚀**
